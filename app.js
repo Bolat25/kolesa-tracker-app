@@ -17,8 +17,9 @@
  *   bd/tr/fu/dr коды кузова/КПП/топлива/привода, vf/vt объём, pv только частники,
  *   nw 0 любая / 1 новая / 2 с пробегом, sw руль 0/1 левый/2 правый, cu 1 — только растаможенные,
  *   w слова (фразы), x минус-слова, rp повторные публикации, p пауза, r счётчик правок.
- * Состояние: v, l язык, lim лимит подписок, u доступ до (unix), tr пробный (1/0),
- *   q тихие часы [с, до (минуты), "silent"|"hold"] или null, st.m медиана скорости (с), subs.
+ * Состояние (бот: webapp_state.py): v, l язык, lim лимит подписок, u доступ до (unix), tr пробный
+ *   (1/0), pay оплата включена, sr счётчик правок настроек, q тихие часы [с, до (минуты),
+ *   "silent"|"hold"] или null, st.m медиана скорости (с), subs.
  */
 (function () {
   "use strict";
@@ -321,10 +322,15 @@
   function accessCard() {
     var now = Date.now() / 1000;
     var active = state.u && state.u > now;
+    // кнопка оплаты — только если в боте включена оплата (state.pay)
+    function payButton(key) {
+      return state.pay ? h("button", { class: "pay", type: "button",
+                                       onclick: function () { send({ v: 1, op: "pay" }); } }, T(key)) : null;
+    }
     if (!active) {
       return h("div", { class: "access off" },
         h("div", { class: "txt" }, h("span", { class: "big", text: T("access_none") })),
-        h("button", { class: "pay", type: "button", onclick: function () { send({ v: 1, op: "pay" }); } }, T("pay_btn")));
+        payButton("pay_btn"));
     }
     var left = daysLeft(state.u);
     var small = (state.tr ? T("access_trial") + " · " : "") + T("access_until", { date: dateText(state.u) });
@@ -332,7 +338,7 @@
       h("div", { class: "txt" },
         h("span", { class: "small", text: small }),
         h("span", { class: "big", text: left <= 1 ? T("access_today") : T("access_left", { n: left }) })),
-      h("button", { class: "pay", type: "button", onclick: function () { send({ v: 1, op: "pay" }); } }, T("extend_btn")));
+      payButton("extend_btn"));
   }
 
   function subCard(sub) {
@@ -783,7 +789,8 @@
           chip(T("quiet_hold"), screen.mode === "hold", function () { screen.mode = "hold"; render(); }))));
     }
     setDock(T("settings_save"), function () {
-      send({ v: 1, op: "settings", l: screen.l, q: screen.q ? [screen.q[0], screen.q[1], screen.mode] : null });
+      send({ v: 1, op: "settings", sr: state.sr || 0, l: screen.l,
+             q: screen.q ? [screen.q[0], screen.q[1], screen.mode] : null });
     });
   }
 
@@ -839,7 +846,7 @@
   function demoState() {
     var now = Math.floor(Date.now() / 1000);
     return {
-      v: 1, l: "ru", lim: 5, u: now + 7 * 86400, tr: 0, q: [23 * 60, 8 * 60, "silent"], st: { m: 37 },
+      v: 1, l: "ru", lim: 5, u: now + 7 * 86400, tr: 0, pay: 1, sr: 0, q: [23 * 60, 8 * 60, "silent"], st: { m: 37 },
       subs: [
         { i: 1, b: "Toyota", m: ["Camry"], g: "c", gv: "almaty", yf: 2015, pt: 15000000, r: 1 },
         { i: 2, b: "Hyundai", m: [], g: "kz", yf: 2015, pt: 8000000, r: 1 },
