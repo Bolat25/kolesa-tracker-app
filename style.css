@@ -1,0 +1,134 @@
+/* Оформление «Трасса» (вариант B, выбран 07.10): светлый асфальт, чёрный контур,
+   дорожный жёлтый и синий указатель. */
+:root {
+  --ground: #F3F2EC;
+  --card: #FFFFFF;
+  --ink: #15181D;
+  --ink-2: #3A3F47;
+  --muted: #50565F;
+  --line: #C9C7BC;
+  --line-soft: #E2E0D6;
+  --yellow: #F5C400;
+  --blue: #0A4F91;
+  --blue-soft: #D6E6F7;
+  --paused: #ECEBE4;
+  --danger: #A3241B;
+  --radius: 12px;
+  --font: "Fira Sans", system-ui, sans-serif;
+  --font-narrow: "Fira Sans Condensed", "Fira Sans", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--font); }
+body { min-height: 100vh; padding-bottom: 104px; -webkit-tap-highlight-color: transparent; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+a { color: var(--blue); }
+[hidden] { display: none !important; }
+
+.road { height: 8px; background: repeating-linear-gradient(90deg, var(--ink) 0 28px, var(--yellow) 28px 56px); }
+.banner { margin: 10px 16px 0; padding: 8px 12px; border-radius: 8px; background: var(--yellow); font-size: 13px; font-weight: 600; }
+main { max-width: 520px; margin: 0 auto; padding: 0 16px; }
+.loading, .empty { padding: 32px 4px; color: var(--muted); font-size: 15px; line-height: 1.5; }
+
+/* шапка экрана */
+.head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 14px 0 6px; }
+.head h1 { margin: 0; font-family: var(--font-narrow); font-weight: 700; font-size: 30px; line-height: 1.1; }
+.head .left { display: flex; align-items: center; gap: 4px; min-width: 0; }
+.icon-btn { min-width: 44px; height: 44px; padding: 0 12px; border-radius: 10px; border: 2px solid var(--ink); background: var(--card); font-weight: 700; font-size: 14px; }
+.back { width: 44px; height: 44px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; margin-left: -10px; }
+
+/* доступ — синий указатель */
+.access { margin-top: 8px; background: var(--blue); color: #fff; border-radius: var(--radius); border: 3px solid #fff; outline: 2px solid var(--blue); padding: 12px 14px; display: flex; align-items: center; gap: 12px; }
+.access .txt { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.access .small { font-size: 13px; color: var(--blue-soft); }
+.access .big { font-family: var(--font-narrow); font-weight: 700; font-size: 28px; line-height: 1.05; }
+.access .pay { height: 44px; padding: 0 16px; border-radius: 10px; border: 0; background: var(--yellow); color: var(--ink); font-weight: 700; font-size: 15px; white-space: nowrap; }
+.access.off { background: var(--danger); outline-color: var(--danger); }
+.speed { margin-top: 10px; display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--ink-2); }
+.speed b { color: var(--ink); }
+
+.section { margin: 18px 0 8px; display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; }
+
+/* карточка подписки */
+.subs { display: flex; flex-direction: column; gap: 10px; }
+.sub { background: var(--card); border: 2px solid var(--ink); border-radius: var(--radius); padding: 10px 6px 10px 14px; display: flex; gap: 8px; align-items: center; }
+.sub .open { flex: 1; min-width: 0; border: 0; background: transparent; padding: 2px 0; text-align: left; display: flex; flex-direction: column; gap: 6px; }
+.sub .title { font-family: var(--font-narrow); font-weight: 700; font-size: 22px; line-height: 1.15; overflow-wrap: anywhere; }
+.sub .meta { font-size: 14px; color: var(--ink-2); line-height: 1.35; }
+.badge { align-self: flex-start; background: var(--yellow); color: var(--ink); border-radius: 6px; padding: 3px 8px; font-size: 13px; font-weight: 700; }
+.badge.ghost { background: transparent; border: 1.5px solid var(--muted); color: var(--muted); font-weight: 600; padding: 2px 8px; }
+.sub.paused { background: var(--paused); border-style: dashed; border-color: #8A8F97; }
+.sub.paused .title, .sub.paused .meta { color: var(--muted); }
+
+/* переключатель */
+.switch { width: 58px; height: 44px; border: 0; background: transparent; padding: 0; display: flex; align-items: center; justify-content: center; flex: none; }
+.switch .track { width: 50px; height: 28px; border-radius: 14px; background: #B9BCC1; display: flex; align-items: center; justify-content: flex-start; padding: 3px; transition: background .15s; }
+.switch .knob { width: 22px; height: 22px; border-radius: 11px; background: #fff; }
+.switch[aria-checked="true"] .track { background: var(--blue); justify-content: flex-end; }
+
+.row-btns { margin-top: 16px; display: flex; gap: 10px; }
+.row-btns button { flex: 1; height: 44px; border-radius: 10px; border: 2px solid var(--ink); background: var(--card); font-weight: 600; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+
+/* редактор */
+.estimate { margin-top: 6px; border-radius: var(--radius); background: var(--yellow); padding: 12px 14px; display: flex; align-items: center; gap: 12px; }
+.estimate .txt { display: flex; flex-direction: column; gap: 2px; }
+.estimate .n { font-family: var(--font-narrow); font-weight: 700; font-size: 23px; line-height: 1.1; }
+.estimate .note { font-size: 13px; font-weight: 500; }
+.field { margin-top: 18px; display: flex; flex-direction: column; gap: 10px; }
+.field > .label, .field > label { font-size: 14px; font-weight: 700; }
+.field .hint { font-weight: 400; color: var(--muted); }
+.help { font-size: 13px; color: var(--muted); line-height: 1.4; margin: 0; }
+.input { height: 46px; border-radius: 10px; border: 2px solid var(--ink); background: var(--card); padding: 0 14px; font-size: 16px; width: 100%; }
+.input:focus { outline: 3px solid var(--yellow); outline-offset: 0; }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.grid2 .field { margin-top: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { min-height: 38px; padding: 0 14px; border-radius: 8px; border: 2px solid var(--line); background: var(--card); font-size: 14px; }
+.chip[aria-pressed="true"] { border-color: var(--blue); background: var(--blue); color: #fff; font-weight: 700; }
+.chip.all { border-style: dashed; border-color: var(--ink); background: transparent; font-weight: 600; }
+.seg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.seg .chip { height: 44px; padding: 0 6px; }
+.pick { height: 46px; border-radius: 10px; border: 2px solid var(--ink); background: var(--card); padding: 0 14px; font-size: 15px; display: flex; align-items: center; justify-content: space-between; text-align: left; width: 100%; }
+.pick .val { color: var(--muted); }
+.error { color: var(--danger); font-size: 14px; font-weight: 600; margin: 10px 0 0; }
+
+/* «Ещё фильтры» — табличка со строками */
+.more { margin-top: 20px; background: var(--card); border: 2px solid var(--ink); border-radius: var(--radius); overflow: hidden; }
+.more .toggle { width: 100%; height: 52px; border: 0; background: var(--ink); color: var(--yellow); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; font-family: var(--font-narrow); font-weight: 700; font-size: 19px; }
+.more .toggle .sum { font-family: var(--font); font-weight: 400; font-size: 13px; color: #E9E7DD; max-width: 60%; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.more .row { width: 100%; min-height: 52px; padding: 6px 8px 6px 16px; display: flex; align-items: center; justify-content: space-between; gap: 10px; border: 0; border-bottom: 1px solid var(--line-soft); background: transparent; text-align: left; font-size: 15px; }
+.more .row:last-child { border-bottom: 0; }
+.more .row .val { color: var(--muted); text-align: right; padding-right: 8px; }
+.more .row .two { display: flex; flex-direction: column; }
+.more .row .two small { font-size: 12px; color: var(--muted); }
+.more .note { padding: 10px 16px 12px; font-size: 12px; color: var(--muted); line-height: 1.4; border-bottom: 1px solid var(--line-soft); margin: 0; }
+
+/* слова-фишки */
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { display: inline-flex; align-items: center; gap: 2px; min-height: 34px; padding: 0 4px 0 10px; border-radius: 8px; background: var(--blue-soft); color: var(--blue); font-weight: 600; font-size: 14px; }
+.tag.minus { background: #F6DEDB; color: var(--danger); }
+.tag button { width: 30px; height: 30px; border: 0; background: transparent; color: inherit; font-size: 18px; }
+.addrow { display: flex; gap: 8px; }
+.addrow .input { flex: 1; }
+.addrow button { height: 46px; padding: 0 14px; border-radius: 10px; border: 2px solid var(--ink); background: var(--card); font-weight: 600; }
+
+/* списки выбора (марка, модель, город) */
+.list { margin-top: 12px; background: var(--card); border: 2px solid var(--ink); border-radius: var(--radius); overflow: hidden; }
+.list .item { width: 100%; min-height: 50px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; gap: 10px; border: 0; border-bottom: 1px solid var(--line-soft); background: transparent; text-align: left; font-size: 15px; }
+.list .item:last-child { border-bottom: 0; }
+.list .item small { color: var(--muted); font-size: 13px; }
+.list .item[aria-pressed="true"] { background: var(--blue-soft); font-weight: 600; }
+.check { width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--ink); display: inline-flex; align-items: center; justify-content: center; flex: none; }
+.item[aria-pressed="true"] .check { background: var(--blue); border-color: var(--blue); }
+
+.danger-btn { margin-top: 22px; width: 100%; height: 48px; border-radius: 10px; border: 2px solid var(--danger); background: transparent; color: var(--danger); font-weight: 600; font-size: 15px; }
+
+/* нижняя кнопка */
+.dock { position: fixed; left: 0; right: 0; bottom: 0; padding: 12px 16px calc(16px + env(safe-area-inset-bottom)); background: var(--ground); border-top: 1px solid var(--line-soft); }
+.cta { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; max-width: 520px; margin: 0 auto; height: 56px; border-radius: 12px; border: 0; background: var(--ink); color: var(--yellow); font-family: var(--font-narrow); font-weight: 700; font-size: 21px; }
+.cta:disabled { background: #8A8F97; color: #E9E7DD; }
+.cta.small { height: 44px; font-size: 17px; }
+
+.dialog { border: 2px solid var(--ink); border-radius: var(--radius); padding: 16px; max-width: 90vw; }
+.dialog pre { background: var(--ground); padding: 10px; border-radius: 8px; font-size: 12px; overflow: auto; max-height: 50vh; }

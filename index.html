@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light">
+  <title>Подписки на Kolesa</title>
+  <!-- Скрипт Telegram: кнопка «Назад», sendData, цвет шапки. Без Telegram — демо-режим. -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Fira Sans: кириллица с казахскими буквами (ә ғ қ ң ө ұ ү һ і) -->
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&family=Fira+Sans+Condensed:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="road" aria-hidden="true"></div>
+  <div id="banner" class="banner" hidden></div>
+  <main id="app" aria-live="polite">
+    <p class="loading">…</p>
+  </main>
+  <!-- Нижняя кнопка экрана: «Новая подписка», «Сохранить» -->
+  <div id="dock" class="dock" hidden>
+    <button id="dock-button" class="cta" type="button"></button>
+  </div>
+  <dialog id="demo-dialog" class="dialog">
+    <p id="demo-title"></p>
+    <pre id="demo-out"></pre>
+    <form method="dialog"><button class="cta small" id="demo-close"></button></form>
+  </dialog>
+  <script src="match.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
