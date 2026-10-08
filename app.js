@@ -76,9 +76,15 @@
     return number(n);
   }
 
+  function volume(v) { return String(v).replace(".", ","); }    // 1.6 → «1,6»
+
   function two(x) { return (x < 10 ? "0" : "") + x; }
   function timeText(minutes) { return two(Math.floor(minutes / 60)) + ":" + two(minutes % 60); }
-  function dateText(unix) { var d = new Date(unix * 1000); return two(d.getDate()) + "." + two(d.getMonth() + 1); }
+  function dateText(unix) {
+    var d = new Date(unix * 1000);
+    var text = two(d.getDate()) + "." + two(d.getMonth() + 1);
+    return d.getFullYear() === new Date().getFullYear() ? text : text + "." + d.getFullYear();
+  }
   function daysLeft(until) { return Math.max(0, Math.ceil((until * 1000 - Date.now()) / 86400000)); }
 
   function digits(text) {
@@ -274,12 +280,30 @@
 
   function subMeta(sub) {
     var parts = [placeText(sub)];
-    parts.push(rangeText(sub.pf, sub.pt, money, "price_from", "price_to", "price_range"));
+    if (sub.pf >= 1e6 && sub.pt >= 1e6) {
+      // «4–9 млн ₸», а не «4 млн–9 млн ₸»
+      parts.push(T("price_range", { a: String(Math.round(sub.pf / 1e5) / 10).replace(".", ","), b: money(sub.pt) }));
+    } else {
+      parts.push(rangeText(sub.pf, sub.pt, money, "price_from", "price_to", "price_range"));
+    }
     parts.push(rangeText(sub.yf, sub.yt, String, "year_from", "year_to", "year_range"));
     if (sub.km) parts.push(T("km_to", { v: number(sub.km) }));
-    var extra = extrasCount(sub);
-    if (extra) parts.push(T("more_filters_n", { n: extra }));
-    return parts.filter(Boolean).join(" · ");
+    return parts.concat(extrasText(sub)).filter(Boolean).join(" · ");
+  }
+
+  // остальные фильтры коротко (как в карточке бота): «автомат · бензин · от 1,6 л · растаможен»
+  function extrasText(sub) {
+    var parts = [listText(sub.bd, dirs.dict.body), listText(sub.tr, dirs.dict.transm),
+                 listText(sub.fu, dirs.dict.fuel), listText(sub.dr, dirs.dict.drive),
+                 rangeText(sub.vf, sub.vt, volume, "vol_from", "vol_to", "vol_range")];
+    if (sub.pv) parts.push(T("m_private"));
+    if (sub.nw) parts.push(T(sub.nw === 1 ? "m_new" : "m_used"));
+    if (sub.sw) parts.push(T(sub.sw === 1 ? "m_steer_left" : "m_steer_right"));
+    if (sub.cu) parts.push(T("m_customs"));
+    if (sub.rp) parts.push(T("m_reposts"));
+    if (sub.w && sub.w.length) parts.push(T("m_words", { v: sub.w.join(", ") }));
+    if (sub.x && sub.x.length) parts.push(T("m_minus", { v: sub.x.join(", ") }));
+    return parts;
   }
 
   function perDay(sub) { return M.perDay(sub, sample); }
@@ -305,7 +329,8 @@
         h("span", { text: T("speed_line", { sec: state.st.m + " с" }) })));
     }
     app.appendChild(h("div", { class: "section" },
-      h("span", { text: T("subs_head") }), h("span", { text: T("subs_count", { n: subs.length, lim: state.lim }) })));
+      h("span", { text: T("subs_head") }),
+      h("span", { text: T("subs_count", { n: subs.length, lim: state.lim >= 999 ? T("lim_inf") : state.lim }) })));
     if (!subs.length) app.appendChild(h("p", { class: "empty", text: T("subs_empty") }));
     app.appendChild(h("div", { class: "subs" }, subs.map(subCard)));
 
@@ -374,17 +399,22 @@
 
   function renderEditor(screen) {
     var d = screen.draft;
-    app.appendChild(header(d.i ? T("editor_edit") : T("editor_new")));
+    app.appendChild(header(d.i ? subTitle(d) : T("editor_new")));
 
     var estN = h("span", { class: "n" });
-    var estNote = h("span", { class: "note", text: T(sample.demo ? "estimate_note_demo" : "estimate_note") });
-    app.appendChild(h("div", { class: "estimate" }, icon("sign", 30, "#15181D"),
-      h("div", { class: "txt" }, estN, estNote)));
+    var estNote = h("span", { class: "note" });
+    var estIcon = icon("sign", 26, "#15181D");
+    var estBox = h("div", { class: "estimate" }, estIcon, h("div", { class: "txt" }, estN, estNote));
+    app.appendChild(estBox);
     function estimate() {
       var n = perDay(d);
       var shown = roundDay(n);
-      estN.textContent = n < 0.5 ? T("estimate_less")
-                                 : T("estimate", { n: shown, ads: plural(parseInt(shown.replace(/\s/g, ""), 10), "ads_forms") });
+      var narrow = n < 0.5;
+      estN.textContent = narrow ? T("estimate_less")
+                                : T("estimate", { n: shown, ads: plural(parseInt(shown.replace(/\s/g, ""), 10), "ads_forms") });
+      estNote.textContent = narrow ? T("estimate_narrow") : T(sample.demo ? "estimate_note_demo" : "estimate_note");
+      estBox.classList.toggle("warn", narrow);       // жёлтая с ⚠ — только предупреждение
+      estIcon.style.display = narrow ? "" : "none";
     }
     estimate();
     screen.estimate = estimate;
@@ -443,7 +473,7 @@
     app.appendChild(h("div", { class: "grid2", style: "margin-top: 14px" },
       numberField("pf", T("price_from_l"), d, true), numberField("pt", T("price_to_l"), d, true)));
     app.appendChild(h("div", { class: "chips", style: "margin-top: 10px" }, QUICK_PRICES.map(function (n) {
-      return chip(T("mln", { v: n / 1e6 }), d.pt === n && !d.pf, function () { d.pf = null; d.pt = n; changed(true); });
+      return chip(T("to_mln", { v: n / 1e6 }), d.pt === n && !d.pf, function () { d.pf = null; d.pt = n; changed(true); });
     })));
     app.appendChild(h("div", { class: "field" },
       h("label", { for: "f-km", text: T("km_l") }),

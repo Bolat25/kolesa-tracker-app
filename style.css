@@ -71,7 +71,8 @@ main { max-width: 520px; margin: 0 auto; padding: 0 16px; }
 .row-btns button { flex: 1; height: 44px; border-radius: 10px; border: 2px solid var(--ink); background: var(--card); font-weight: 600; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; }
 
 /* редактор */
-.estimate { margin-top: 6px; border-radius: var(--radius); background: var(--yellow); padding: 12px 14px; display: flex; align-items: center; gap: 12px; }
+.estimate { margin-top: 6px; border-radius: var(--radius); background: var(--card, #fff); border: 2px solid var(--line, #d9d6cc); padding: 10px 14px; display: flex; align-items: center; gap: 12px; }
+.estimate.warn { background: var(--yellow); border-color: var(--yellow); }
 .estimate .txt { display: flex; flex-direction: column; gap: 2px; }
 .estimate .n { font-family: var(--font-narrow); font-weight: 700; font-size: 23px; line-height: 1.1; }
 .estimate .note { font-size: 13px; font-weight: 500; }
