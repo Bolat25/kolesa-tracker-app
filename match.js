@@ -69,7 +69,7 @@
         if (sub.vt && r.vol10 > Math.round(sub.vt * 10)) return false;
       }
     }
-    if (sub.pv && r.seller !== 0) return false;
+    if (sub.pv && (r.seller === 4 || r.seller === 7)) return false;   // салоны — как «От дилеров» сайта
     if (sub.nw === 1 && r.new === 0) return false;
     if (sub.nw === 2 && r.new === 1) return false;
     if (sub.sw === 1 && r.right === 1) return false;
