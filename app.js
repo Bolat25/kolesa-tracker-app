@@ -35,6 +35,11 @@
   var MAX_WORDS = 10;
   var MAX_MINUS = 10;
   var QUICK_PRICES = [3e6, 5e6, 10e6, 15e6, 25e6];
+  var QUICK_KM = [100000, 150000, 200000, 300000];
+  var KM_SUSPECT = 1000000;      // больше — почти наверняка лишний ноль (12.10: 1 800 000 в подписке)
+  // кузова — по частоте на Kolesa (5 074 карточки, 07.10): частые сверху, не как в справочнике сайта
+  var BODY_ORDER = ["11", "23", "21", "13", "31", "12", "22", "35", "18", "14", "32", "17", "15", "33", "36",
+                    "16", "19", "34"];
   var QUIET_PRESETS = [[23 * 60, 8 * 60], [0, 7 * 60]];
   var TOP_BRANDS = 8;
   var TOP_MODELS = 8;
@@ -334,11 +339,12 @@
     if (!subs.length) app.appendChild(h("p", { class: "empty", text: T("subs_empty") }));
     app.appendChild(h("div", { class: "subs" }, subs.map(subCard)));
 
+    // одна кнопка: «Тихие часы» и «Настройки» открывали один экран; тихие часы — в подписи
     var q = state.q;
     app.appendChild(h("div", { class: "row-btns" },
-      h("button", { type: "button", onclick: openSettings }, icon("moon", 18),
-        q ? T("quiet_btn_on", { from: timeText(q[0]).slice(0, 2), to: timeText(q[1]).slice(0, 2) }) : T("quiet_btn")),
-      h("button", { type: "button", onclick: openSettings }, icon("gear", 18), T("settings_btn"))));
+      h("button", { type: "button", onclick: openSettings }, icon("gear", 18),
+        T("settings_btn") + (q ? " · " + T("quiet_btn_on", { from: timeText(q[0]).slice(0, 2),
+                                                             to: timeText(q[1]).slice(0, 2) }) : ""))));
 
     var full = subs.length >= state.lim;
     setDock(full ? T("limit_reached") : T("add_sub"), openNew, !full);
@@ -488,9 +494,22 @@
     app.appendChild(h("div", { class: "chips", style: "margin-top: 10px" }, QUICK_PRICES.map(function (n) {
       return chip(T("to_mln", { v: n / 1e6 }), d.pt === n && !d.pf, function () { d.pf = null; d.pt = n; changed(true); });
     })));
+    var kmInput = numberInput("f-km", "km", d, true);
+    var kmWarn = h("p", { class: "warn-text", role: "status", text: T("km_big") });
+    var kmChips = QUICK_KM.map(function (n) {
+      return chip(T("to_k", { v: n / 1000 }), d.km === n, function () { d.km = n; changed(true); });
+    });
+    function kmCheck() {
+      kmWarn.hidden = !(d.km > KM_SUSPECT);
+      kmChips.forEach(function (b, k) { b.setAttribute("aria-pressed", d.km === QUICK_KM[k] ? "true" : "false"); });
+    }
+    kmInput.addEventListener("input", kmCheck);
+    kmCheck();
     app.appendChild(h("div", { class: "field" },
       h("label", { for: "f-km", text: T("km_l") }),
-      numberInput("f-km", "km", d, true),
+      kmInput,
+      h("div", { class: "chips", style: "margin-top: 10px" }, kmChips),
+      kmWarn,
       h("p", { class: "help", text: T("km_hint") })));
 
     app.appendChild(moreBlock(screen));
@@ -848,6 +867,8 @@
     brands.forEach(function (b) { d.brandBy[b.n] = b; });
     cities.forEach(function (c) { d.cityBy[c.k] = c; });
     dict.regions.forEach(function (r) { d.regionBy[r.v] = r; });
+    function rank(o) { var i = BODY_ORDER.indexOf(o.v); return i < 0 ? BODY_ORDER.length : i; }
+    dict.body = dict.body.slice().sort(function (a, b) { return rank(a) - rank(b); });
     return d;
   }
 

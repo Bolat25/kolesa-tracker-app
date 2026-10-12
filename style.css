@@ -55,6 +55,9 @@ main { max-width: 520px; margin: 0 auto; padding: 0 16px; }
 .sub { background: var(--card); border: 2px solid var(--ink); border-radius: var(--radius); padding: 10px 6px 10px 14px; display: flex; gap: 8px; align-items: center; }
 .sub .open { flex: 1; min-width: 0; border: 0; background: transparent; padding: 2px 0; text-align: left; display: flex; flex-direction: column; gap: 6px; }
 .sub .title { font-family: var(--font-narrow); font-weight: 700; font-size: 22px; line-height: 1.15; overflow-wrap: anywhere; }
+.sub .title::after { content: " ›"; color: var(--muted); font-weight: 600; }   /* карточка — открыть правку */
+.warn-text { margin: 8px 0 0; padding: 8px 10px; border-radius: 8px; background: var(--yellow); font-size: 13px; line-height: 1.4; }
+.warn-text[hidden] { display: none; }
 .sub .meta { font-size: 14px; color: var(--ink-2); line-height: 1.35; }
 .badge { align-self: flex-start; background: var(--yellow); color: var(--ink); border-radius: 6px; padding: 3px 8px; font-size: 13px; font-weight: 700; }
 .badge.ghost { background: transparent; border: 1.5px solid var(--muted); color: var(--muted); font-weight: 600; padding: 2px 8px; }
