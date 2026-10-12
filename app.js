@@ -397,6 +397,19 @@
   function openNew() { push({ name: "editor", draft: draftOf(null), more: false }); }
   function openEditor(sub) { push({ name: "editor", draft: draftOf(sub), more: extrasCount(sub) > 0 }); }
 
+  // кнопка внизу чата открывает сразу редактор (бот: «➕ Создать подписку», «✏️ Изменить»):
+  // go=new — новая подписка, go=e<номер> — эта. Лимит исчерпан или подписки нет — список
+  function openFromLink(go) {
+    if (!go) return;
+    if (go === "new") {
+      if (state.subs.length < state.lim) openNew();
+      return;
+    }
+    var id = go.charAt(0) === "e" ? parseInt(go.slice(1), 10) : NaN;
+    var sub = state.subs.filter(function (s) { return s.i === id; })[0];
+    if (sub) openEditor(sub);
+  }
+
   function renderEditor(screen) {
     var d = screen.draft;
     app.appendChild(header(d.i ? subTitle(d) : T("editor_new")));
@@ -939,6 +952,7 @@
         lang = i18n[state.l] ? state.l : "ru";
         stack = [{ name: "home" }];
         render();
+        openFromLink(hashParam("go"));
       })
       .catch(function () {
         app.innerHTML = "";
